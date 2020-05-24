@@ -22,7 +22,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework_csv.renderers import CSVRenderer
 
 from .filters import DocumentFilter
-from .models import Project, Label, Document, RoleMapping, Role
+from .models import Project, Label, Document, RoleMapping, Role, DocumentAnnotation
 from .permissions import IsProjectAdmin, IsAnnotatorAndReadOnly, IsAnnotator, IsAnnotationApproverAndReadOnly, \
     IsOwnAnnotation, IsAnnotationApprover
 from .serializers import ProjectSerializer, LabelSerializer, DocumentSerializer, UserSerializer
@@ -48,14 +48,14 @@ class Datastore:
     def init_db(self):
         c = self.cursor()
         c.execute('''CREATE TABLE IF NOT EXISTS document_annotations
-        (OPERATION text, USER text, DOCUMENT text, LABEL text, ANNOTATION text, TIMESTAMP timestamp)''')
+        (OPERATION text, USERNAME text, LABEL text, LABEL_ID integer, ANNOTATION_ID integer, DOCUMENT integer, TIMESTAMP timestamp)''')
 
-    def post(self, operation, user, document, label=None, annotation=None):
+    def post(self, operation, username, document_id, label=None, label_id=None, annotation_id=None):
         time = datetime.datetime.now()
         c = self.cursor()
-        c.execute('INSERT INTO document_annotations VALUES(?, ?, ?, ?, ?, ?)',
-                  (str(operation), str(user), str(document),
-                   str(label), str(annotation), time))
+        c.execute('INSERT INTO document_annotations VALUES(?, ?, ?, ?, ?, ?, ?)',
+                  (str(operation), str(username),
+                   str(label), label_id, annotation_id, document_id, time))
         self.conn.commit()
 
     def close(self):
@@ -124,7 +124,7 @@ class StatisticsAPI(APIView):
         try:
             store = Datastore()
             if 'doc_id' in request.GET:
-                store.post('READ', self.request.user.id, request.GET['doc_id'])
+                store.post('READ', self.request.user.username, request.GET['doc_id'])
             store.close()
         except sqlite3.OperationalError as err:
             pass
@@ -248,8 +248,9 @@ class AnnotationList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         try:
             store = Datastore()
-            label = self.request.data['label']
-            store.post('CREATE', self.request.user.id, self.kwargs['doc_id'], label)
+            label_id = self.request.data['label']
+            label = Label.objects.get(id=label_id)
+            store.post('CREATE', self.request.user.username, self.kwargs['doc_id'], label, label.id)
             store.close()
         except sqlite3.OperationalError as err:
             pass
@@ -275,7 +276,11 @@ class AnnotationDetail(generics.RetrieveUpdateDestroyAPIView):
     def perform_destroy(self, instance):
         try:
             store = Datastore()
-            store.post('DELETE', self.request.user.id, self.kwargs['doc_id'], None, self.kwargs['annotation_id'])
+            annotation_id = self.kwargs['annotation_id']
+            annotation = DocumentAnnotation.objects.get(id=annotation_id)
+            label_id = annotation.label_id
+            label = Label.objects.get(id=label_id)
+            store.post('DELETE', self.request.user.username, self.kwargs['doc_id'], label.text, label_id, annotation_id)
             store.close()
         except sqlite3.OperationalError as err:
             pass

@@ -1,0 +1,50 @@
+{% extends "layouts/default.html" %}
+
+{% set container_class = 'container' %}
+
+{% block container %}
+    <div class="pt-3">
+        <div class="row mb-3">
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Annotation Progress</h2>
+                        <h1 class="card-subtitle mb-2 display-1">{{ statistics.annotations.percentage }} %</h1>
+                        <p class="card-text text-muted">Completed: {{ statistics.annotations.count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Documents</h2>
+                        <h1 class="card-subtitle mb-2 display-1">{{ statistics.documents.count }}</h1>
+                        <p class="card-text text-muted">Count</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Annotation Count</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for u in statistics.users %}
+                        <tr>
+                            <th scope="row">{{ loop.index }}</th>
+                            <td>{{ u.username }}</td>
+                            <td>{{ u.annotations.count }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

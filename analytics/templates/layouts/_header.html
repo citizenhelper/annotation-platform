@@ -1,0 +1,34 @@
+<nav class="navbar static-top navbar-expand-lg navbar-light shadow-sm">
+    <!-- Image and text -->
+    <a class="navbar-brand" href="javascript:void(0)" id="menu-toggle">
+        CitizenHelper
+    </a>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mt-2 mt-lg-0">
+            <li class="nav-item {% if 'index' == active_page %}active{% endif %}">
+                <a class="nav-link" href="/"> Home
+                    {% if 'index' == active_page %}<span class="sr-only">(current)</span>{% endif %}
+                </a>
+            </li>
+            <li class="nav-item {% if 'statistics' == active_page %}active{% endif %}">
+                <a class="nav-link" href="/statistics"> Statistics
+                    {% if 'statistics' == active_page %}<span class="sr-only">(current)</span>{% endif %}
+                </a>
+            </li>
+            <li class="nav-item {% if 'documents' == active_page %}active{% endif %}">
+                <a class="nav-link" href="/documents"> Documents
+                    {% if 'documents' == active_page %}<span class="sr-only">(current)</span>{% endif %}
+                </a>
+            </li>
+            <li class="nav-item {% if 'actions' == active_page %}active{% endif %}">
+                <a class="nav-link" href="/actions"> Actions
+                    {% if 'actions' == active_page %}<span class="sr-only">(current)</span>{% endif %}
+                </a>
+            </li>
+        </ul>
+    </div>
+    <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</nav>
