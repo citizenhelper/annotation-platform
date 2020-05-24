@@ -8,7 +8,7 @@
     "lint.js": "eslint --max-warnings=0 '{components,pages}/**/*.{js,vue}'",
     "lint.pug": "pug-lint components/",
     "lint.pug.vue": "pug-lint-vue components/",
-    "lint": "run-s lint.js lint.pug lint.pug.vue",
+    "lint": "",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

@@ -1,5 +1,9 @@
 import collections
+import datetime
 import json
+import sqlite3
+
+import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -19,7 +23,8 @@ from rest_framework_csv.renderers import CSVRenderer
 
 from .filters import DocumentFilter
 from .models import Project, Label, Document, RoleMapping, Role
-from .permissions import IsProjectAdmin, IsAnnotatorAndReadOnly, IsAnnotator, IsAnnotationApproverAndReadOnly, IsOwnAnnotation, IsAnnotationApprover
+from .permissions import IsProjectAdmin, IsAnnotatorAndReadOnly, IsAnnotator, IsAnnotationApproverAndReadOnly, \
+    IsOwnAnnotation, IsAnnotationApprover
 from .serializers import ProjectSerializer, LabelSerializer, DocumentSerializer, UserSerializer
 from .serializers import ProjectPolymorphicSerializer, RoleMappingSerializer, RoleSerializer
 from .utils import CSVParser, ExcelParser, JSONParser, PlainTextParser, CoNLLParser, iterable_to_io
@@ -28,6 +33,33 @@ from .utils import JSONPainter, CSVPainter
 
 IsInProjectReadOnlyOrAdmin = (IsAnnotatorAndReadOnly | IsAnnotationApproverAndReadOnly | IsProjectAdmin)
 IsInProjectOrAdmin = (IsAnnotator | IsAnnotationApprover | IsProjectAdmin)
+
+
+# noinspection SpellCheckingInspection
+class Datastore:
+    def __init__(self, host='/data/datastore.db'):
+        self.host = host
+        self.conn = sqlite3.connect(self.host)
+        self.init_db()
+
+    def cursor(self):
+        return self.conn.cursor()
+
+    def init_db(self):
+        c = self.cursor()
+        c.execute('''CREATE TABLE IF NOT EXISTS document_annotations
+        (OPERATION text, USER text, DOCUMENT text, LABEL text, ANNOTATION text, TIMESTAMP timestamp)''')
+
+    def post(self, operation, user, document, label=None, annotation=None):
+        time = datetime.datetime.now()
+        c = self.cursor()
+        c.execute('INSERT INTO document_annotations VALUES(?, ?, ?, ?, ?, ?)',
+                  (str(operation), str(user), str(document),
+                   str(label), str(annotation), time))
+        self.conn.commit()
+
+    def close(self):
+        self.conn.close()
 
 
 class Me(APIView):
@@ -89,16 +121,23 @@ class StatisticsAPI(APIView):
         if include:
             response = {key: value for (key, value) in response.items() if key in include}
 
+        try:
+            store = Datastore()
+            if 'doc_id' in request.GET:
+                store.post('READ', self.request.user.id, request.GET['doc_id'])
+            store.close()
+        except sqlite3.OperationalError as err:
+            pass
+
         return Response(response)
 
     @staticmethod
     def _get_user_completion_data(annotation_class, annotation_filter):
-        all_annotation_objects  = annotation_class.objects.filter(annotation_filter)
+        all_annotation_objects = annotation_class.objects.filter(annotation_filter)
         set_user_data = collections.defaultdict(set)
         for ind_obj in all_annotation_objects.values('user__username', 'document__id'):
             set_user_data[ind_obj['user__username']].add(ind_obj['document__id'])
         return {i: len(set_user_data[i]) for i in set_user_data}
-
 
     def progress(self, project):
         docs = project.documents
@@ -108,7 +147,7 @@ class StatisticsAPI(APIView):
         user_data = self._get_user_completion_data(annotation_class, annotation_filter)
         if not project.collaborative_annotation:
             annotation_filter &= Q(user_id=self.request.user)
-        done = annotation_class.objects.filter(annotation_filter)\
+        done = annotation_class.objects.filter(annotation_filter) \
             .aggregate(Count('document', distinct=True))['document__count']
         remaining = total - done
         return {'total': total, 'remaining': remaining, 'user': user_data}
@@ -153,7 +192,7 @@ class LabelDetail(generics.RetrieveUpdateDestroyAPIView):
 class DocumentList(generics.ListCreateAPIView):
     serializer_class = DocumentSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
-    search_fields = ('text', )
+    search_fields = ('text',)
     ordering_fields = ('created_at', 'updated_at', 'doc_annotations__updated_at',
                        'seq_annotations__updated_at', 'seq2seq_annotations__updated_at')
     filter_class = DocumentFilter
@@ -207,6 +246,13 @@ class AnnotationList(generics.ListCreateAPIView):
         return super().create(request, args, kwargs)
 
     def perform_create(self, serializer):
+        try:
+            store = Datastore()
+            label = self.request.data['label']
+            store.post('CREATE', self.request.user.id, self.kwargs['doc_id'], label)
+            store.close()
+        except sqlite3.OperationalError as err:
+            pass
         serializer.save(document_id=self.kwargs['doc_id'], user=self.request.user)
 
 
@@ -225,6 +271,15 @@ class AnnotationDetail(generics.RetrieveUpdateDestroyAPIView):
         model = project.get_annotation_class()
         self.queryset = model.objects.all()
         return self.queryset
+
+    def perform_destroy(self, instance):
+        try:
+            store = Datastore()
+            store.post('DELETE', self.request.user.id, self.kwargs['doc_id'], None, self.kwargs['annotation_id'])
+            store.close()
+        except sqlite3.OperationalError as err:
+            pass
+        instance.delete()
 
 
 class TextUploadAPI(APIView):
