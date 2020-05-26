@@ -94,5 +94,12 @@ class Model:
             self.conn = conn
         self.query = Query(self)
 
+    def execute(self, query):
+        c = self.conn.cursor()
+        c.execute(query)
+        header = [h[0].lower() for h in c.description]
+        for o in c:
+            yield dict(zip(header, o))
+
     def close(self):
         self.conn.close()

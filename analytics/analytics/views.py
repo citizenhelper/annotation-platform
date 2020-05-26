@@ -30,9 +30,9 @@ def favicon():
     return send_from_directory(static_path, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
-@page.route('/')
-def index_page():
-    return render_template('index.html', title=get_title('Home'), active_page='index')
+# @page.route('/')
+# def index_page():
+#     return render_template('index.html', title=get_title('Home'), active_page='index')
 
 
 @page.route('/actions')
@@ -63,36 +63,28 @@ def documents_page(offset=1):
     return render_template('documents.html', title=get_title('Home'), active_page='documents', pagination=pagination)
 
 
-@page.route('/statistics')
-def statistics_page():
+@page.route('/')
+def home_page():
     statistics = {
-        'annotations': {
-            'count': 0,
-            'percentage': 0,
-        },
-        'documents': {
-            'count': 0
-        },
-        'users': []
+        'annotations': {},
+        'documents': {'count': 'N/A'},
+        'users': [],
+        'agreement': [],
     }
     path = '/Users/yasas/Documents/Docker/data/doccano.db'
-    model = Model(path, 'api_documentannotation')
-    statistics['annotations']['count'] = model.query.count()
-    user_model = Model(table='auth_user', conn=model.conn)
-    documents_model = Model(table='api_document', conn=model.conn)
-    statistics['documents']['count'] = documents_model.query.count()
-    try:
-        statistics['annotations']['percentage'] = statistics['annotations']['count'] * 100 / statistics['documents']['count']
-    except:
-        pass
-    for u in user_model.query.all():
-        user_id = u['id']
-        username = u['username']
-        statistics['users'].append({
-            'username': username,
-            'annotations': {
-                'count': model.query.filter(user_id=user_id).count()
-            }
-        })
+    model = Model(path, 'api_document')
+    document_stat_q = '''SELECT COUNT(DISTINCT a.document_id) completed, COUNT(DISTINCT d.id) count, (CAST(COUNT(DISTINCT a.document_id) * 100 AS REAL) / CAST(COUNT(DISTINCT d.id) AS REAL)) percentage from api_document d LEFT JOIN api_documentannotation a ON (a.document_id=d.id);'''
+    for c in model.execute(document_stat_q):
+        statistics['annotations'] = c
+        break
+    user_progress_q = '''SELECT u.username username, COUNT(DISTINCT d.id) total, COUNT(DISTINCT a.document_id) completed, (CAST(COUNT(DISTINCT a.document_id) * 100 AS REAL) / CAST(COUNT(DISTINCT d.id) AS REAL)) percentage  from
+    auth_user u
+        JOIN api_project_users q ON (q.user_id=u.id)
+        JOIN api_project p ON (q.project_id=p.id)
+        JOIN api_document d ON (d.project_id=p.id)
+        JOIN api_documentannotation a ON (a.user_id=u.id)
+    GROUP BY u.id;'''
+    for c in model.execute(user_progress_q):
+        statistics['users'].append(c)
     model.close()
-    return render_template('statistics.html', title=get_title('Home'), active_page='annotations', statistics=statistics)
+    return render_template('statistics.html', title=get_title('Home'), active_page='index', statistics=statistics)

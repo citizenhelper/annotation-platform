@@ -1,6 +1,6 @@
 <nav class="navbar static-top navbar-expand-lg navbar-light shadow-sm">
     <!-- Image and text -->
-    <a class="navbar-brand" href="javascript:void(0)" id="menu-toggle">
+    <a class="navbar-brand" href="http://citizenhelper.orc.gmu.edu/" id="menu-toggle" target="_blank">
         CitizenHelper
     </a>
     <div class="collapse navbar-collapse" id="navbarNav">
@@ -8,11 +8,6 @@
             <li class="nav-item {% if 'index' == active_page %}active{% endif %}">
                 <a class="nav-link" href="/"> Home
                     {% if 'index' == active_page %}<span class="sr-only">(current)</span>{% endif %}
-                </a>
-            </li>
-            <li class="nav-item {% if 'statistics' == active_page %}active{% endif %}">
-                <a class="nav-link" href="/statistics"> Statistics
-                    {% if 'statistics' == active_page %}<span class="sr-only">(current)</span>{% endif %}
                 </a>
             </li>
             <li class="nav-item {% if 'documents' == active_page %}active{% endif %}">

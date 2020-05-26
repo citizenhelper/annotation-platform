@@ -10,7 +10,7 @@
                     <div class="card-body">
                         <h2 class="card-title">Annotation Progress</h2>
                         <h1 class="card-subtitle mb-2 display-1">{{ statistics.annotations.percentage }} %</h1>
-                        <p class="card-text text-muted">Completed: {{ statistics.annotations.count }}</p>
+                        <p class="card-text text-muted">Completed: {{ statistics.annotations.completed }} of {{ statistics.annotations.count }}</p>
                     </div>
                 </div>
             </div>
@@ -31,7 +31,9 @@
                     <tr>
                         <th scope="col">#</th>
                         <th scope="col">Username</th>
-                        <th scope="col">Annotation Count</th>
+                        <th scope="col">Assigned</th>
+                        <th scope="col">Completed</th>
+                        <th scope="col">Percentage</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -39,7 +41,9 @@
                         <tr>
                             <th scope="row">{{ loop.index }}</th>
                             <td>{{ u.username }}</td>
-                            <td>{{ u.annotations.count }}</td>
+                            <td>{{ u.total }}</td>
+                            <td>{{ u.completed }}</td>
+                            <td>{{ u.percentage }} %</td>
                         </tr>
                     {% endfor %}
                     </tbody>
