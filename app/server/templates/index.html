@@ -4,44 +4,22 @@
 
 {% block header %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.3/css/swiper.min.css">
+    <link rel="stylesheet" href="{% static 'static/background.css' %}">
 {% endblock %}
 
 {% block content %}
-    <section class="hero">
-        <div class="container">
-            <div class="columns">
-                <div class="column is-8">
-                    <h1 class="title is-1">Welcome to CitizenHelper!</h1>
-                    <h2 class="subtitle is-4">Realtime Streaming Analytics System for Mining Social, Web,
-                        and IoT Data for Emergency Services and Humanitarian Agencies</h2>
-                </div>
-                <div class="column is-4">
-                    <img src="https://www.dropbox.com/s/0s3j7j9aez1dkg4/Setup%20Wizard-amico.png?dl=1"
-                         style="max-height: 350px;">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <
-    <section class="hero">
-        <div class="container">
-            <div class="columns">
-                <div class="column is-3">
-                    <div class="card">
-                        <div class="card-image">
-                            <figure class="image is-3">
-                                <img src="https://www.dropbox.com/s/xdkepltikukpyih/covid-19-funny.png?dl=1"
-                                     alt="Placeholder image" style="object-fit: contain;">
-                            </figure>
-                        </div>
-                        <footer class="card-footer">
-                            <a href="{% url 'login' %}" class="card-footer-item">Annotator</a>
-                            <a href="http://citizenhelper.orc.gmu.edu:5001/" class="card-footer-item">Statistics</a>
-                            <a href="http://citizenhelper.orc.gmu.edu:5601/" class="card-footer-item">Analytics</a>
-                        </footer>
-                    </div>
-                </div>
+    <section class="section has-background-light" style="height: 100%;">
+        <div class="container" style="overflow-y: hidden">
+            <h1 class="title" style="text-align: center;">Welcome to CitizenHelper!</h1>
+            <h2 class="subtitle" style="text-align: center;">Realtime Streaming Analytics System for Mining Social, Web,
+                and IoT Data for Emergency Services and Humanitarian Agencies</h2>
+            <div class="box has-text-centered">
+                <a href="{% url 'login' %}" class="button is-info">Contribute</a>
+                <a href="http://citizenhelper.orc.gmu.edu:5601/" class="button is-info">Analytics</a>
+                <figure class="image image is-fullwidth has-image-centered"
+                        style="width: 900px;margin-left: auto;margin-right: auto;padding-top: 10px;">
+                    <img src="static/static/background.png">
+                </figure>
             </div>
         </div>
     </section>
@@ -49,15 +27,14 @@
     <footer class="footer border-top">
         <div class="columns">
             <div class="column">
-                <h3 class="text-center">
+                <h3 style="text-align: center;">
                     <a href="https://ist.gmu.edu/~hpurohit/informatics-lab.html">Human-Info-Lab</a>
                 </h3>
-                <p class="text-center">
+                <p style="text-align: center;">
                     Volgenau School of Engineering, George Mason University, USA
                 </p>
             </div>
         </div>
-        <a href="https://www.freepik.com/" target="_blank">Background Images - www.freepik.com</a><br>
     </footer>
 {% endblock %}
 
