@@ -60,12 +60,6 @@
             <span>GitHub</span>
           </a>
           {% endif %}
-          <a class="navbar-item" href="http://citizenhelper.orc.gmu.edu:5001/" target="_blank">
-            <span>Statistics</span>
-          </a>
-          <a class="navbar-item" href="http://citizenhelper.orc.gmu.edu:5601/" target="_blank">
-            <span>Analytics</span>
-          </a>
           {% if user.is_authenticated %}
           <a class="navbar-item" href="{% url 'projects' %}">
             <span>Projects</span>
@@ -73,7 +67,7 @@
           {% endif %}
           {% if not user.is_authenticated %}
           <a class="navbar-item" href="{% url 'login' %}">
-            <span>Contribute</span>
+            <span>Login</span>
           </a>
           {% else %}
           <a class="navbar-item" href="{% url 'logout' %}">

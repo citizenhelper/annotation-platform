@@ -35,9 +35,11 @@
                                      alt="Placeholder image" style="object-fit: contain;">
                             </figure>
                         </div>
-                        <div class="card-content">
-                            COVID-19 Twitter Analytics (Current)
-                        </div>
+                        <footer class="card-footer">
+                            <a href="{% url 'login' %}" class="card-footer-item">Annotator</a>
+                            <a href="http://citizenhelper.orc.gmu.edu:5001/" class="card-footer-item">Statistics</a>
+                            <a href="http://citizenhelper.orc.gmu.edu:5601/" class="card-footer-item">Analytics</a>
+                        </footer>
                     </div>
                 </div>
             </div>
@@ -45,21 +47,17 @@
     </section>
 
     <footer class="footer border-top">
-        <div class="container">
-            <div class="row justify-content-center">
-                <h3 class="text-center"><a
-                        href="https://ist.gmu.edu/~hpurohit/informatics-lab.html">HumanInfoLab</a>
+        <div class="columns">
+            <div class="column">
+                <h3 class="text-center">
+                    <a href="https://ist.gmu.edu/~hpurohit/informatics-lab.html">Human-Info-Lab</a>
                 </h3>
                 <p class="text-center">
                     Volgenau School of Engineering, George Mason University, USA
                 </p>
             </div>
-            <div class="footer-col col-md-4">
-                <a href="https://www.freepik.com/" target="_blank">Background Images - www.freepik.com</a>
-                <a href="https://github.com/doccano/doccano" target="_blank">Doccano</a>
-            </div>
         </div>
-        </div>
+        <a href="https://www.freepik.com/" target="_blank">Background Images - www.freepik.com</a><br>
     </footer>
 {% endblock %}
 
