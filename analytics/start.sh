@@ -1,1 +1,1 @@
-gunicorn -w 4 -b 0.0.0.0:4000 "analytics:create_app('config.py')"
+gunicorn -w 4 -b 0.0.0.0:5001 "analytics:create_app('config.py')"

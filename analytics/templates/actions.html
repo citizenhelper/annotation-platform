@@ -3,45 +3,51 @@
 {% set container_class = 'container' %}
 
 {% block container %}
-    <div class="p-3">
-        <table class="table table-bordered">
-            <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Operation</th>
-                <th scope="col">Username</th>
-                <th scope="col">Label</th>
-                <th scope="col">Document ID</th>
-                <th scope="col">Label ID</th>
-                <th scope="col">Timestamp</th>
-                <th scope="col">Annotation ID</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for action in pagination['items'] %}
-                <tr>
-                    <th scope="row">{{ pagination['offset'] + loop.index - 1 }}</th>
-                    <td>{{ action.operation }}</td>
-                    <td>{{ action.username }}</td>
-                    <td>{{ action.label }}</td>
-                    <td><a href="{{ url_for('page.documents_page', offset=action.document) }}">{{ action.document }}</a></td>
-                    <td>{{ action.label_id }}</td>
-                    <td>{{ action.timestamp }}</td>
-                    <td>{{ action.annotation_id }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <nav aria-label="Page navigation example">
-        <ul class="pagination">
-            <li class="page-item {% if not pagination['has_prev'] %} disabled {% endif %}"><a class="page-link" href="{{ url_for('page.actions_page', offset=pagination['prev']) }}">Previous</a></li>
-            {% for offset, page in pagination['iter_pages'] %}
-                {% if page %}
-                    <li class="page-item"><a class="page-link" href="{{ url_for('page.actions_page', offset=offset) }}">{{ page }}</a></li>
-                {% endif %}
-            {% endfor %}
-            <li class="page-item {% if not pagination['has_next'] %} disabled {% endif %}"><a class="page-link" href="{{ url_for('page.actions_page', offset=pagination['next']) }}">Next</a></li>
-        </ul>
-    </nav>
+<div class="p-3">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Operation</th>
+            <th scope="col">Username</th>
+            <th scope="col">Label</th>
+            <th scope="col">Document ID</th>
+            <th scope="col">Label ID</th>
+            <th scope="col">Timestamp</th>
+            <th scope="col">Annotation ID</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for action in pagination['items'] %}
+        <tr>
+            <th scope="row">{{ pagination['offset'] + loop.index - 1 }}</th>
+            <td>{{ action.operation }}</td>
+            <td>{{ action.username }}</td>
+            <td>{{ action.label }}</td>
+            <td><a href="{{ url_for('page.documents_page', offset=action.document) }}">{{ action.document }}</a></td>
+            <td>{{ action.label_id }}</td>
+            <td>{{ action.timestamp }}</td>
+            <td>{{ action.annotation_id }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <img src="data:image/png;base64,{{ plot_url }}">
+</div>
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <li class="page-item {% if not pagination['has_prev'] %} disabled {% endif %}"><a class="page-link"
+                                                                                          href="{{ url_for('page.actions_page', offset=pagination['prev']) }}">Previous</a>
+        </li>
+        {% for offset, page in pagination['iter_pages'] %}
+        {% if page %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('page.actions_page', offset=offset) }}">{{ page
+            }}</a></li>
+        {% endif %}
+        {% endfor %}
+        <li class="page-item {% if not pagination['has_next'] %} disabled {% endif %}"><a class="page-link"
+                                                                                          href="{{ url_for('page.actions_page', offset=pagination['next']) }}">Next</a>
+        </li>
+    </ul>
+</nav>
 {% endblock %}

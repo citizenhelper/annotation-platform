@@ -21,6 +21,11 @@ class Query:
             self.filters.append(F.equals(k, v))
         return self
 
+    def filter_by(self, *filters):
+        for f in filters:
+            self.filters.append(f)
+        return self
+
     def order_by(self, **kwargs):
         self.sorted = True
         for k, v in kwargs.items():

@@ -3,52 +3,74 @@
 {% set container_class = 'container' %}
 
 {% block container %}
-    <div class="pt-3">
-        <div class="row mb-3">
-            <div class="col-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h2 class="card-title">Annotation Progress</h2>
-                        <h1 class="card-subtitle mb-2 display-1">{{ statistics.annotations.percentage }} %</h1>
-                        <p class="card-text text-muted">Completed: {{ statistics.annotations.completed }} of {{ statistics.annotations.count }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h2 class="card-title">Documents</h2>
-                        <h1 class="card-subtitle mb-2 display-1">{{ statistics.documents.count }}</h1>
-                        <p class="card-text text-muted">Count</p>
-                    </div>
+<div class="pt-3">
+    <div class="row mb-3">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Annotation Progress</h2>
+                    <h1 class="card-subtitle mb-2 display-1">N/A</h1>
+                    <p class="card-text text-muted">N/A</p>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col">
-                <table class="table table-bordered">
-                    <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Username</th>
-                        <th scope="col">Assigned</th>
-                        <th scope="col">Completed</th>
-                        <th scope="col">Percentage</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for u in statistics.users %}
-                        <tr>
-                            <th scope="row">{{ loop.index }}</th>
-                            <td>{{ u.username }}</td>
-                            <td>{{ u.total }}</td>
-                            <td>{{ u.completed }}</td>
-                            <td>{{ u.percentage }} %</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Documents</h2>
+                    <h1 class="card-subtitle mb-2 display-1">{{ statistics.documents.count }}</h1>
+                    <p class="card-text text-muted">Count</p>
+                </div>
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Username</th>
+                    <th scope="col" style="text-align:right;">Assigned</th>
+                    <th scope="col" style="text-align:right;">Completed</th>
+                    <th scope="col" style="text-align:right;">Percentage</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for u in statistics.users %}
+                <tr>
+                    <th scope="row">{{ u.id }}</th>
+                    <td>{{ u.username }}</td>
+                    <td>{{ u.total }}</td>
+                    <td>{{ u.completed }}</td>
+                    <td>{{'%0.2f'|format(u.percentage|float)}} %</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col"># of Annotations</th>
+                    <th scope="col"># of Documents</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for a in statistics.annotations %}
+                <tr>
+                    <th scope="row">{{ loop.index }}</th>
+                    <td>{{ a.annotation_count }}</td>
+                    <td>{{ a.frequency }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
