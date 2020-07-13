@@ -59,7 +59,7 @@ def build_plot(x, y):
 @page.route('/actions/<int:offset>')
 @auth.login_required
 def actions_page(offset=1):
-    path = page.config['SQLITE_PATH']
+    path = page.config['SQLITE_PATH'] + 'datastore.db'
     model = Model(path)
     pagination = model.query \
         .order_by(timestamp='DESC').pagination(offset)
@@ -84,7 +84,7 @@ def documents_page_redirect():
 @auth.login_required
 def dataset_page():
     dataset = {}
-    path = '/home/ywijesu/annotation_data/doccano.db'
+    path = page.config['SQLITE_PATH'] + 'doccano.db'
     model = Model(path, 'api_annotations')
     expert_username = request.args.get('expert', None)
     dataset_q = '''SELECT d.text text, d.meta meta, l.text label, u.username user FROM api_documentannotation a 
@@ -115,6 +115,7 @@ def dataset_page():
             dataset[tweet_id] = {
                 'annotations': {},
                 'text': c['text'],
+                'created_at': created_at,
             }
         dataset[tweet_id]['annotations'].update(annotations)
     results = []
@@ -160,7 +161,7 @@ def dataset_page():
         if len(labels) == 0:
             # Skip undetermined tweet
             invalid += 1
-            continue
+            labels.append('Irrelevant')
         # Add sentiment labels if they are at least annotated by two annotators
         if sentiment_vote['Negative Sentiment'] > 1:
             labels.append('Negative Sentiment')
@@ -195,7 +196,7 @@ def dataset_page():
 @page.route('/documents/<int:offset>')
 @auth.login_required
 def documents_page(offset=1):
-    path = '/home/ywijesu/annotation_data/doccano.db'
+    path = page.config['SQLITE_PATH'] + 'doccano.db'
     model = Model(path, 'api_document')
     pagination = model.query.pagination(offset)
     model.close()
@@ -211,7 +212,7 @@ def home_page():
         'users': [],
         'agreement': [],
     }
-    path = '/home/ywijesu/annotation_data/doccano.db'
+    path = page.config['SQLITE_PATH'] + 'doccano.db'
     model = Model(path, 'api_document')
     user_progress_q = '''SELECT u.username username, u.id id, COUNT(DISTINCT d.id) total, COUNT(DISTINCT a.document_id) completed, (CAST(COUNT(DISTINCT a.document_id) * 100 AS REAL) / CAST(COUNT(DISTINCT d.id) AS REAL)) percentage  from
     auth_user u

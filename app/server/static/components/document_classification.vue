@@ -35,54 +35,56 @@ block annotation-area
       hr
       div.content
         div.text.scrollable(ref="textbox", v-if="docs[pageNumber]") {{ docs[pageNumber].text }}
+
+
 </template>
 
 <style scoped>
-hr {
-  margin: 0.8rem 0;
-}
+    hr {
+        margin: 0.8rem 0;
+    }
 
-.card-header-title {
-  padding: 1.5rem;
-}
+    .card-header-title {
+        padding: 1.5rem;
+    }
 </style>
 
 <script>
-import annotationMixin from './annotationMixin';
-import HTTP from './http';
-import { simpleShortcut } from './filter';
+    import annotationMixin from './annotationMixin';
+    import HTTP from './http';
+    import {simpleShortcut} from './filter';
 
-export default {
-  filters: { simpleShortcut },
+    export default {
+        filters: {simpleShortcut},
 
-  mixins: [annotationMixin],
+        mixins: [annotationMixin],
 
-  methods: {
-    getAnnotation(label) {
-      return this.annotations[this.pageNumber].find(annotation => annotation.label === label.id);
-    },
+        methods: {
+            getAnnotation(label) {
+                return this.annotations[this.pageNumber].find(annotation => annotation.label === label.id);
+            },
 
-    async submit() {
-      const state = this.getState();
-      this.url = `docs?q=${this.searchQuery}&doc_annotations__isnull=${state}&offset=${this.offset}&ordering=${this.ordering}`;
-      await this.search();
-      this.pageNumber = 0;
-    },
+            async submit() {
+                const state = this.getState();
+                this.url = `docs?q=${this.searchQuery}&doc_annotations__isnull=${state}&offset=${this.offset}&ordering=${this.ordering}`;
+                await this.search();
+                this.pageNumber = 0;
+            },
 
-    async addLabel(label) {
-      const annotation = this.getAnnotation(label);
-      if (annotation) {
-        this.removeLabel(annotation);
-      } else {
-        const docId = this.docs[this.pageNumber].id;
-        const payload = {
-          label: label.id,
-        };
-        await HTTP.post(`docs/${docId}/annotations`, payload).then((response) => {
-          this.annotations[this.pageNumber].push(response.data);
-        });
-      }
-    },
-  },
-};
+            async addLabel(label) {
+                const annotation = this.getAnnotation(label);
+                if (annotation) {
+                    this.removeLabel(annotation);
+                } else {
+                    const docId = this.docs[this.pageNumber].id;
+                    const payload = {
+                        label: label.id,
+                    };
+                    await HTTP.post(`docs/${docId}/annotations`, payload).then((response) => {
+                        this.annotations[this.pageNumber].push(response.data);
+                    });
+                }
+            },
+        },
+    };
 </script>

@@ -109,17 +109,19 @@ div.columns(v-cloak="")
           )
 
     div.columns.is-multiline.is-gapless.is-mobile.is-vertical-center
-      div.column.is-3
+      div.column.is-3.hidden
         progress.progress.is-inline-block(
           v-bind:class="progressColor"
           v-bind:value="achievement"
           max="100"
         ) 30%
-      div.column.is-6
+      div.column.is-6.hidden
         span.ml10
           strong {{ total - remaining }}
         | /
         span {{ total }}
+
+      div.column.is-9
 
       div.column.is-1.has-text-right
         a.button.tooltip.is-tooltip-bottom(
@@ -170,6 +172,13 @@ div.columns(v-cloak="")
 
       div.level-center
         span.button.is-static {{ offset + pageNumber + 1 }} / {{ count }}
+
+      div.level-center
+        div.field.has-addons
+          p.control
+            input(id='updateOffset' class='input' type='number')
+          p.control
+            button(type='button' class='button' onclick='location="http://localhost/projects/2/#offset=" + (document.getElementById("updateOffset").value - 1);window.location.reload();') Go
 
       div.level-right
         div.buttons

@@ -294,4 +294,20 @@ body {
   align-items: center;
 }
 
+/*#message-pane > div.level.mt30 > div.level-center {*/
+/*  visibility: hidden;*/
+/*}*/
+
+#message-pane > div.level.mt30 > div.level-left > div > a:nth-child(1) {
+  display: none
+}
+
+#message-pane > div.level.mt30 > div.level-right > div > a:nth-child(2) {
+  display: none
+}
+
+#message-pane > div.level.mt30 > div.level-right > div > a:nth-child(1) {
+  order: 1;
+}
+
 [v-cloak] { display: none; }
