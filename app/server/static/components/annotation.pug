@@ -178,7 +178,7 @@ div.columns(v-cloak="")
           p.control
             input(id='updateOffset' class='input' type='number')
           p.control
-            button(type='button' class='button' onclick='location="http://localhost/projects/2/#offset=" + (document.getElementById("updateOffset").value - 1);window.location.reload();') Go
+            button(type='button' class='button' onclick='location=location.protocol + "//" + location.host + location.pathname + "#offset=" + (document.getElementById("updateOffset").value - 1);window.location.reload();') Go
 
       div.level-right
         div.buttons
