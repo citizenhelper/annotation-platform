@@ -95,6 +95,7 @@ export default {
             isAnnotationApprover: false,
             isMetadataActive: false,
             isAnnotationGuidelineActive: false,
+            resumeOffset: 0,
         };
     },
 
@@ -231,9 +232,9 @@ export default {
         statUpdate() {
             // fetch progress info.
             let doc_id = this.docs[this.pageNumber].id;
-            let url = 'statistics?include=total&include=remaining&doc_id=' + doc_id;
-            console.log(url);
+            let url = 'statistics?include=total&include=remaining&doc_id=' + doc_id + '&offset=' + (this.offset + this.pageNumber);
             HTTP.get(url).then((response) => {
+                this.resumeOffset = response.data.offset;
                 this.total = response.data.total;
                 this.remaining = response.data.remaining;
             });

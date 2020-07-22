@@ -3,30 +3,29 @@ import datetime
 import json
 import sqlite3
 
-import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models import Count, F, Q
 from django.db.utils import IntegrityError
 from django.shortcuts import get_object_or_404, redirect
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Count, F, Q
 from libcloud.base import DriverType, get_driver
 from libcloud.storage.types import ContainerDoesNotExistError, ObjectDoesNotExistError
 from rest_framework import generics, filters, status
 from rest_framework.exceptions import ParseError, ValidationError
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser
 from rest_framework_csv.renderers import CSVRenderer
 
 from .filters import DocumentFilter
 from .models import Project, Label, Document, RoleMapping, Role, DocumentAnnotation
 from .permissions import IsProjectAdmin, IsAnnotatorAndReadOnly, IsAnnotator, IsAnnotationApproverAndReadOnly, \
     IsOwnAnnotation, IsAnnotationApprover
-from .serializers import ProjectSerializer, LabelSerializer, DocumentSerializer, UserSerializer
 from .serializers import ProjectPolymorphicSerializer, RoleMappingSerializer, RoleSerializer
+from .serializers import ProjectSerializer, LabelSerializer, DocumentSerializer, UserSerializer
 from .utils import CSVParser, ExcelParser, JSONParser, PlainTextParser, CoNLLParser, iterable_to_io
 from .utils import JSONLRenderer
 from .utils import JSONPainter, CSVPainter
@@ -57,6 +56,14 @@ class Datastore:
                   (str(operation), str(username),
                    str(label), label_id, annotation_id, document_id, time))
         self.conn.commit()
+
+    def get_last_changed(self, username):
+        c = self.cursor()
+        c.execute(
+            f"SELECT DOCUMENT FROM document_annotations WHERE USERNAME = '{username}' AND OPERATION = 'OFFSET' ORDER BY TIMESTAMP DESC;")
+        for x in c:
+            return x[0]
+        return 0
 
     def close(self):
         self.conn.close()
@@ -123,8 +130,12 @@ class StatisticsAPI(APIView):
 
         try:
             store = Datastore()
+            offset = store.get_last_changed(self.request.user.username)
+            response['offset'] = str(offset)
             if 'doc_id' in request.GET:
                 store.post('READ', self.request.user.username, request.GET['doc_id'])
+            if 'offset' in request.GET and int(request.GET['offset']) > int(offset):
+                store.post('OFFSET', self.request.user.username, request.GET['offset'])
             store.close()
         except sqlite3.OperationalError as err:
             pass
