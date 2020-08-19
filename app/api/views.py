@@ -57,10 +57,10 @@ class Datastore:
                    str(label), label_id, annotation_id, document_id, time))
         self.conn.commit()
 
-    def get_last_changed(self, username):
+    def get_last_changed(self, username, project_id):
         c = self.cursor()
         c.execute(
-            f"SELECT DOCUMENT FROM document_annotations WHERE USERNAME = '{username}' AND OPERATION = 'OFFSET' ORDER BY TIMESTAMP DESC;")
+            f"SELECT DOCUMENT FROM document_annotations WHERE USERNAME = '{username}' AND OPERATION = 'OFFSET' AND ANNOTATION_ID = {project_id} ORDER BY TIMESTAMP DESC;")
         for x in c:
             return x[0]
         return 0
@@ -130,12 +130,13 @@ class StatisticsAPI(APIView):
 
         try:
             store = Datastore()
-            offset = store.get_last_changed(self.request.user.username)
+            project_id = int(self.kwargs['project_id'])
+            offset = store.get_last_changed(self.request.user.username, project_id)
             response['offset'] = str(offset)
             if 'doc_id' in request.GET:
                 store.post('READ', self.request.user.username, request.GET['doc_id'])
             if 'offset' in request.GET and int(request.GET['offset']) > int(offset):
-                store.post('OFFSET', self.request.user.username, request.GET['offset'])
+                store.post('OFFSET', self.request.user.username, request.GET['offset'], annotation_id=project_id)
             store.close()
         except sqlite3.OperationalError as err:
             pass
